@@ -15,13 +15,16 @@
 #include "proc_time.h"
 
 // Número de processos
-int NPROC;
+int NPROC = 10;
 
 // Tempo máximo da execução total de um processo (microsegundos)
 int MAX_TIME = 100;
 
 // Tempo máximo da execução de um processo por entrada na CPU (microsegundos)
 int QUANTUM = 20;
+
+// Habilita ou desabilita o modo VERBOSE (DEBUG)
+int VERBOSE = 0;
 
 // Valor que define a chance de haver uma interrupção
 double INTERRUPT_PROB = 0.5;
@@ -56,24 +59,63 @@ sigset_t set;
 
 int main (int argc, char *argv[])
 {
-    // Só permite o programa executar se seu uso for correto
-    if (argc != 2)
-    {
-        printf("Uso: %s [numero de processos]\n", argv[0]);
-        exit(1);
-    }
+    // tratando os parametros da linha de comando
+    int opt;
+    while ((opt = getopt(argc, argv, "n:q:vh")) != -1) {
+        switch (opt) {
+            // Imprimindo uma mensagem de ajuda (help)
+            case 'h':
+                printf("Ajuda:\n");
+                printf("\t-n NPROC - Numero de processos.\n");
+                printf("\t\tValido se NPROC >= 1. Default: NPROC = 10\n");
+                printf("\t-q QUANTUM - Valor do QUANTUM.\n");
+                printf("\t\tValido se QUANTUM >= 2. Default: QUANTUM = 20\n");
+                printf("\t-v - Habilita o modo 'verbose', para debug.\n");
+                printf("\t-h - Exibe esta ajuda.\n");
+                exit(0);
+                break;
+
+            // Obtem o número de processos NPROC informado na linha de comando
+            case 'n':
+                NPROC = atoi(optarg);
+                // Verificando sua validade
+                if( NPROC < 1)
+                {
+                    fprintf(stderr, "Informe um valor válido para os processos [NPROC >= 1]\n");
+                    exit(1);
+                }
+                break;
+
+            // Obtem o valor do QUANTUM informado na linha de comando
+            case 'q':
+                QUANTUM = atoi(optarg);
+                if( QUANTUM < 2)
+                {
+                    fprintf(stderr, "Informe um valor válido para o QUANTUM [QUANTUM >= 2]\n");
+                    exit(2);
+                }
+                break;
+
+            // Modo 'verbose' para debug ativado
+            case 'v':
+                VERBOSE = 1;
+                break;
+
+            case '?':
+                fprintf(stderr, "Erro de parametros!\n");
+                fprintf(stderr, "Uso correto: %s [-n NPROC] [-q QUANTUM] [-v] [-h]\n",
+                        argv[0]);
+                exit(4);
+
+            default:
+                break;
+        }
+    }    
     
-    // Obtem o número de processos informados na linha de comando
-    NPROC = atoi(argv[1]);
-
-    if( NPROC <= 0)
-    {
-        printf("Por favor informe um valor válido [num > 0]\n");
-        exit(2);
-    }
-
-    // FIX: aparentemente ainda está ocorrendo um travamento esporadicamente, 
-    // FIX: verificar se está acontecendo algum caso que deixei passar abaixo.
+    // Parameters
+    printf("%s MAIN - Numero de PROCESSOS %d\n", event(), NPROC);
+    
+    printf("%s MAIN - Valor do QUANTUM: %d\n", event(), QUANTUM);
 
     /*
     Razão para utilizar o semaforo de escalonamento:
@@ -81,8 +123,8 @@ int main (int argc, char *argv[])
       do scheduling, estava havendo um problema quando, em algumas ocasiões,
       a thread scheduling sinalizava a thread do processo, e esta última 
       devolvia a execução tão rapidamente para o scheduling com signal e pausava.
-      Como a scheduling ainda não tinha pausado sua execução, ela azia o pause
-      após a chegada do signal, ficando ambas threads me pause.
+      Como a scheduling ainda não tinha pausado sua execução, ela fazia o pause
+      após a chegada do signal, ficando ambas threads em pause.
       Com o semaforo, a ideia é que a thread scheduling continua executando os 
       processos por meio de signals, mas os processos liberam a execução da
       scheduling por meio do semaforo. Assim, mesmo que a scheduling ainda não
@@ -128,13 +170,13 @@ int main (int argc, char *argv[])
     finished = initqueue(finished);
     
     printf("%s MAIN - Iniciando os processos\n", event());
-
+    
     // Inicia os processos, inserindo-os na fila de aptos
     // NOTE: a fila é selecionada internamente à função, a partir das variaveis globais
     proc_init();
 
     // FIX: debug?
-    printf(">> MAIN - imprimindo fila 'ready':\n");
+    printf("%s MAIN - imprimindo fila 'ready':\n", event());
     printqueue(ready);
     
     // printf("main: fila blocked:\n");

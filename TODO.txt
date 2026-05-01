@@ -1,6 +1,6 @@
 - [OK] fix the lock error
 - insert option to remove prints to debug
-- organize files in folders
+- [OK] organize files in folders
     - src
     - schedulers
         - fifo
