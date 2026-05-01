@@ -4,7 +4,6 @@
 #include <time.h>
 #include <pthread.h>
 #include <signal.h>
-#include <semaphore.h>
 
 #include "queue.h"
 #include "proc.h"
@@ -48,9 +47,6 @@ char gbuffer[100];
 
 // counter for the number of events of the system
 int event_num = 1;
-
-// Semaforo utilizado para fazer o controle da execução da thread scheduling
-sem_t sem_scheduling;
 
 // Variaveis utilizadas para definir o conjunto de signals que as threads dos 
 // processos irão aceitar
@@ -117,24 +113,6 @@ int main (int argc, char *argv[])
     
     printf("%s MAIN - Valor do QUANTUM: %d\n", event(), QUANTUM);
 
-    /*
-    Razão para utilizar o semaforo de escalonamento:
-    - Durante a troca de contexto entre as threads dos processos e a thread
-      do scheduling, estava havendo um problema quando, em algumas ocasiões,
-      a thread scheduling sinalizava a thread do processo, e esta última 
-      devolvia a execução tão rapidamente para o scheduling com signal e pausava.
-      Como a scheduling ainda não tinha pausado sua execução, ela fazia o pause
-      após a chegada do signal, ficando ambas threads em pause.
-      Com o semaforo, a ideia é que a thread scheduling continua executando os 
-      processos por meio de signals, mas os processos liberam a execução da
-      scheduling por meio do semaforo. Assim, mesmo que a scheduling ainda não
-      tenha bloqueado no semaforo, quando o processo executando liberar o semaforo, 
-      a thread scheduling não ficará mais bloqueada. 
-      Isto serve como uma liberação que irá ser utilizada pela scheduling 
-      quando chegar nesta parte do código, não dependendo mais de um signal posterior.
-     */
-    sem_init(&sem_scheduling, 0, 0);
- 
     // definindo o conjunto de signals que as threads dos processos irão tratar
     sigemptyset(&set); 
     if(sigaddset(&set, SIGUSR1) == -1) 
@@ -151,7 +129,7 @@ int main (int argc, char *argv[])
     // NOTE: Marlison's FIX
     // blocking signals for all child threads (inheriting), only listen to
     // signals with sigwait, and the SO treats the sent signals as PENDING,
-    // unti the thread calls sigwait, not losing the signals sent before the
+    // until the thread calls sigwait, not losing the signals sent before the
     // sigwait call
     if (pthread_sigmask(SIG_BLOCK, &set, NULL) != 0) {
         perror("pthread_sigmask error");
@@ -195,9 +173,6 @@ int main (int argc, char *argv[])
 
     // Finalizando os processos
     procend(finished);
-    
-    // Finalizando o semaforo
-    sem_destroy(&sem_scheduling);
     
     // printf("%s MAIN - Finalizando o simulador\n", event());
     
