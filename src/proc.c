@@ -8,9 +8,10 @@
 #include "queue.h"
 #include "proc.h"
 #include "utils.h"
-#include "time.h"
+#include "proc_time.h"
 #include "thread.h"
 #include "stats.h"
+#include "verbose.h"
 
 extern int NPROC;
 extern pthread_t sched_tid;
@@ -50,7 +51,7 @@ void * process_thread(void * procp)
     struct proc * p = (struct proc *)procp;
 
     // O processo está inciando
-    printf("%s PROC - Iniciando processo: %d [%d u.t.]\n", 
+    vprint("%s PROC - Iniciando processo: %d [%d u.t.]\n", 
            event(), p->pid, p->process_time_total);
 
     // A thread do processo inicia em pausa, 
@@ -69,7 +70,7 @@ void * process_thread(void * procp)
         // TODO: quando um processo ganha o processador, ele começa
         // TODO: a sua execução a partir deste ponto
 
-        printf("%s PROC - Processo %d executando\n", event(), p->pid);
+        vprint("%s PROC - Processo %d executando\n", event(), p->pid);
      
         // Simulando o tempo em que o processo ficará executando:
         process_time_tmp = make_process_time(p);
@@ -83,7 +84,7 @@ void * process_thread(void * procp)
         // Diminuindo o tempo que o processo ainda precisa
         p->remaining_time = p->remaining_time - p->process_time;
 
-        printf("%s PROC - Processo %d processando por %d u.t. [%d/%d]\n", 
+        vprint("%s PROC - Processo %d processando por %d u.t. [%d/%d]\n", 
                event(), p->pid, p->process_time, p->remaining_time, p->process_time_total);
         
         // Simulando o tempo de processamento (ocupação da CPU) através 
@@ -99,7 +100,7 @@ void * process_thread(void * procp)
             // Alterando o status do processo, para apto, 
             p->state = READY;
             
-            printf("%s PROC - Processo %d saiu por preempcao\n", event(), p->pid);
+            vprint("%s PROC - Processo %d saiu por preempcao\n", event(), p->pid);
         }
         // Processo fez E/S
         else if (p->remaining_time > 0)
@@ -108,7 +109,7 @@ void * process_thread(void * procp)
             // Alterando o status do processo, para bloqueado
             p->state = BLOCKED;
             
-            printf("%s PROC - Processo %d saindo por E/S\n", event(), p->pid);
+            vprint("%s PROC - Processo %d saindo por E/S\n", event(), p->pid);
         }
         else
         {
@@ -117,7 +118,7 @@ void * process_thread(void * procp)
             // Alterando o status do processo, para finalizado
             p->state = FINISHED;
 
-            printf("%s PROC - Processo %d finalizando\n", event(), p->pid);
+            vprint("%s PROC - Processo %d finalizando\n", event(), p->pid);
             
             // TODO: remover?
             // printproc(p);
@@ -231,7 +232,7 @@ void procend(struct queue *q)
 {
     struct proc *p, *aux;
 
-    int i=0;
+    // int i=0;
 
     // for (p = q->head; p != NULL; p = p->next) 
     p = q->head; 

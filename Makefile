@@ -1,85 +1,101 @@
+# defining the compiler
+CC = gcc
 
-OBJS = main.o \
-	   proc.o \
-	   queue.o \
-	   sched.o \
-	   utils.o \
-	   time.o \
-	   thread.o \
-	   stats.o 
+# defining the include directory (.h)
+INC = -I./include
+
+# defining the flags
+CFLAGS = -Wall -g $(INC)
+
+# main objects for all executables
+OBJS = build/main.o \
+	   build/proc.o \
+	   build/queue.o \
+	   build/sched.o \
+	   build/utils.o \
+	   build/proc_time.o \
+	   build/thread.o \
+	   build/stats.o \
+	   build/verbose.o
 
 default: fifo
 
 all: fifo sjf ljf prio_static prio_dynamic prio_dynamic_quantum
 
-fifo: $(OBJS) scheduler_fifo.o proc_init.o proc_interrupt.o
-	gcc -pthread $(OBJS) scheduler_fifo.o proc_init.o proc_interrupt.o -o main_fifo
+setup:
+	mkdir -p build
 
-sjf: $(OBJS) scheduler_sjf.o proc_init.o proc_interrupt.o
-	gcc -pthread $(OBJS) scheduler_sjf.o proc_init.o proc_interrupt.o -o main_sjf
+fifo: $(OBJS) build/fifo.o build/proc_init.o build/proc_interrupt.o
+	$(CC) $(CFLAGS) -pthread $(OBJS) build/fifo.o build/proc_init.o build/proc_interrupt.o -o main_fifo
 
-ljf: $(OBJS) scheduler_ljf.o proc_init.o proc_interrupt.o
-	gcc -pthread $(OBJS) scheduler_ljf.o proc_init.o proc_interrupt.o -o main_ljf
+sjf: $(OBJS) build/sjf.o build/proc_init.o build/proc_interrupt.o
+	$(CC) $(CFLAGS) -pthread $(OBJS) build/sjf.o build/proc_init.o build/proc_interrupt.o -o main_sjf
 
-prio_static: $(OBJS) scheduler_prio_static.o proc_init.o proc_interrupt.o
-	gcc -pthread $(OBJS) scheduler_prio_static.o proc_init.o proc_interrupt.o -o main_prio_static
+ljf: $(OBJS) build/ljf.o build/proc_init.o build/proc_interrupt.o
+	$(CC) $(CFLAGS) -pthread $(OBJS) build/ljf.o build/proc_init.o build/proc_interrupt.o -o main_ljf
 
-prio_dynamic: $(OBJS) scheduler_prio_dynamic.o proc_init.o proc_interrupt.o
-	gcc -pthread $(OBJS) scheduler_prio_dynamic.o proc_init.o proc_interrupt.o -o main_prio_dynamic
+prio_static: $(OBJS) build/prio_static.o build/proc_init.o build/proc_interrupt.o
+	$(CC) $(CFLAGS) -pthread $(OBJS) build/prio_static.o build/proc_init.o build/proc_interrupt.o -o main_prio_static
 
-prio_dynamic_quantum: $(OBJS) scheduler_prio_dynamic_quantum.o proc_init.o proc_interrupt.o
-	gcc -pthread $(OBJS) scheduler_prio_dynamic_quantum.o proc_init.o proc_interrupt.o -o main_prio_dynamic_quantum
+prio_dynamic: $(OBJS) build/prio_dynamic.o build/proc_init.o build/proc_interrupt.o
+	$(CC) $(CFLAGS) -pthread $(OBJS) build/prio_dynamic.o build/proc_init.o build/proc_interrupt.o -o main_prio_dynamic
 
-main.o: main.c
-	gcc -c main.c
+prio_dynamic_quantum: $(OBJS) build/prio_dynamic_quantum.o build/proc_init.o build/proc_interrupt.o
+	$(CC) $(CFLAGS) -pthread $(OBJS) build/prio_dynamic_quantum.o build/proc_init.o build/proc_interrupt.o -o main_prio_dynamic_quantum
 
-proc.o: proc.c proc.h
-	gcc -c proc.c
+build/main.o: main.c
+	$(CC) $(CFLAGS) -c main.c -o build/main.o
 
-proc_init.o: proc_init.c proc_init.h
-	gcc -c proc_init.c
+build/proc.o: src/proc.c include/proc.h
+	$(CC) $(CFLAGS) -c src/proc.c -o build/proc.o
 
-proc_interrupt.o: proc_interrupt.c proc_interrupt.h
-	gcc -c proc_interrupt.c
+build/proc_init.o: src/proc_init.c include/proc_init.h
+	$(CC) $(CFLAGS) -c src/proc_init.c -o build/proc_init.o
 
-queue.o: queue.c queue.h
-	gcc -c queue.c
+build/proc_interrupt.o: src/proc_interrupt.c include/proc_interrupt.h
+	$(CC) $(CFLAGS) -c src/proc_interrupt.c -o build/proc_interrupt.o
 
-sched.o: sched.c sched.h
-	gcc -c sched.c
+build/queue.o: src/queue.c include/queue.h
+	$(CC) $(CFLAGS) -c src/queue.c -o build/queue.o
 
-utils.o: utils.c utils.h
-	gcc -c utils.c
+build/sched.o: src/sched.c include/sched.h
+	$(CC) $(CFLAGS) -c src/sched.c -o build/sched.o
 
-time.o: time.c time.h
-	gcc -c time.c
+build/utils.o: src/utils.c include/utils.h
+	$(CC) $(CFLAGS) -c src/utils.c -o build/utils.o
 
-thread.o: thread.c thread.h
-	gcc -c thread.c
+build/proc_time.o: src/proc_time.c include/proc_time.h
+	$(CC) $(CFLAGS) -c src/proc_time.c -o build/proc_time.o
 
-stats.o: stats.c stats.h
-	gcc -c stats.c
+build/thread.o: src/thread.c include/thread.h
+	$(CC) $(CFLAGS) -c src/thread.c -o build/thread.o
 
-scheduler_fifo.o: scheduler_fifo.c scheduler.h
-	gcc -c scheduler_fifo.c
+build/stats.o: src/stats.c include/stats.h
+	$(CC) $(CFLAGS) -c src/stats.c -o build/stats.o
 
-scheduler_sjf.o: scheduler_sjf.c scheduler.h
-	gcc -c scheduler_sjf.c
+build/verbose.o: src/verbose.c include/verbose.h
+	$(CC) $(CFLAGS) -c src/verbose.c -o build/verbose.o
 
-scheduler_ljf.o: scheduler_ljf.c scheduler.h
-	gcc -c scheduler_ljf.c
+build/fifo.o: schedulers/fifo.c include/scheduler.h
+	$(CC) $(CFLAGS) -c schedulers/fifo.c -o build/fifo.o
 
-scheduler_prio_static.o: scheduler_prio_static.c scheduler.h
-	gcc -c scheduler_prio_static.c
+build/sjf.o: schedulers/sjf.c include/scheduler.h
+	$(CC) $(CFLAGS) -c schedulers/sjf.c -o build/sjf.o
 
-scheduler_prio_dynamic.o: scheduler_prio_dynamic.c scheduler.h
-	gcc -c scheduler_prio_dynamic.c
+build/ljf.o: schedulers/ljf.c include/scheduler.h
+	$(CC) $(CFLAGS) -c schedulers/ljf.c -o build/ljf.o
 
-scheduler_prio_dynamic_quantum.o: scheduler_prio_dynamic_quantum.c scheduler.h
-	gcc -c scheduler_prio_dynamic_quantum.c
+build/prio_static.o: schedulers/prio_static.c include/scheduler.h
+	$(CC) $(CFLAGS) -c schedulers/prio_static.c -o build/prio_static.o
+
+build/prio_dynamic.o: schedulers/prio_dynamic.c include/scheduler.h
+	$(CC) $(CFLAGS) -c schedulers/prio_dynamic.c -o build/prio_dynamic.o
+
+build/prio_dynamic_quantum.o: schedulers/prio_dynamic_quantum.c include/scheduler.h
+	$(CC) $(CFLAGS) -c schedulers/prio_dynamic_quantum.c -o build/prio_dynamic_quantum.o
 
 clean:
-	rm -f *.o
+	rm -f build/*.o
 	rm -f main_fifo
 	rm -f main_sjf
 	rm -f main_ljf

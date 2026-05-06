@@ -30,32 +30,24 @@ void thread_handler(int sig)
 // de contexto sempre acontece do scheduling para um processo, e vice-versa
 void context_switch(pthread_t tid)
 {
-    // Se é o scheduling, executa a thread 'tid' e pausa
-    // A execução do scheduling é feita por meio do semaforo
+    // Se é o scheduling, executa a thread 'tid' e pausa/dorme
     if (pthread_self() == sched_tid)
     {
-        // unpause the 'tid' thread
+        // "waking up" the 'tid' thread
         pthread_kill(tid, SIGUSR2);
 
-        // bloqueia no semaforo
-        sem_wait(&sem_scheduling);
+        // "sleeping" scheduler thread
+        sigwait(&set, &snum);  
     }
     // Se é outro processo, então libera a execução do scheduling
     // Em seguida, pausa aguardando um sinal
     else
     {
-        // desbloqueia o scheduling
-        sem_post(&sem_scheduling);
+        // "waking up" scheduler thread
+        pthread_kill(sched_tid, SIGUSR1);
 
-        // pause current thread
-        // pause();
+        // "sleeping" current thread
         sigwait(&set, &snum);  
-        // NOTE: using sigwait instead of pause to take more controle on signals
+        // NOTE: using sigwait instead of pause to take more control on signals
     }
-       
-    // old version
-    // pthread_kill(tid, SIGUSR2);
-    // //pause();
-    // sigwait(&set, &snum);   
 }
-

@@ -3,7 +3,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "time.h"
+#include "proc_time.h"
 
 // contagem global dos eventos
 extern int event_num;

@@ -1,3 +1,4 @@
+struct proc;
 
 int make_time_max();
 
@@ -14,4 +15,3 @@ double set_time_diff_now(struct timeval t);
 double convert_time(struct timeval t);
 
 int interruption();
-

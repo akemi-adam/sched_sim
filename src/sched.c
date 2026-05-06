@@ -6,11 +6,12 @@
 #include "queue.h"
 #include "proc.h"
 #include "thread.h"
-#include "time.h"
+#include "proc_time.h"
 #include "stats.h"
 #include "utils.h"
 #include "proc_interrupt.h"
 #include "scheduler.h"
+#include "verbose.h"
 
 extern int NPROC;
 
@@ -24,9 +25,9 @@ extern struct queue * blocked;
 extern struct queue * finished;
 
 // TODO: essa é a funcao do escalonamento
-void * scheduling_thread()
+void * scheduling_thread(void *arg)
 {
-    printf("%s SCHED -> Escalonador iniciando\n",event());
+    vprint("%s SCHED -> Escalonador iniciando\n",event());
 
     struct proc *p;
 
@@ -47,7 +48,7 @@ void * scheduling_thread()
                 // na fila de bloqueados
                 count_blocked_out(p);
                 
-                printf("%s SCHED -> Interrupcao ocorreu para o processo %d\n", event(), p->pid);
+                vprint("%s SCHED -> Interrupcao ocorreu para o processo %d\n", event(), p->pid);
 
                 // definindo o que fazer com o processo ao voltar de bloqueado
                 proc_interrupt(p);
@@ -55,7 +56,7 @@ void * scheduling_thread()
             else
             {
                 // TODO: isso deveria gerar um event_num?
-                printf("%s SCHED -> Interrupcao nao occorreu!\n",event());
+                vprint("%s SCHED -> Interrupcao nao occorreu!\n",event());
             }
         }
         
@@ -72,7 +73,7 @@ void * scheduling_thread()
             continue;
         }
 
-        printf("%s SCHED -> Selecionado o processo: %d\n", event(), running->pid);
+        vprint("%s SCHED -> Selecionado o processo: %d\n", event(), running->pid);
 
         // FIX: ver se isso ficará no DEBUG
         // printf("sched - fila ready:\n");
@@ -85,7 +86,7 @@ void * scheduling_thread()
 
     // printqueue(finished);
 
-    printf("%s SCHED -> Escalonador finalizando\n", event());
+    vprint("%s SCHED -> Escalonador finalizando\n", event());
     
     // Realizando a contabilização final
     accounting(finished);

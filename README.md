@@ -55,6 +55,22 @@ Serão gerados arquivos executáveis para cada um dos escalonadores.
 Para executar os escalonadores:
 
 ```
-./main_fifo numero_de_processos
+./main_fifo -n 10 -q 20
 ```
+
+Onde, os parâmetros significam:
+
+- **-n NPROC**: Número de processos (caso não informado, o valor *default* é 10)
+- **-q QUANTUM**: Valor do QUANTUM (caso não informado, o valor *default* é 20)
+
+Para análise da execução:
+
+- **-s SEED**: Para fixar um valor da semente da geração de números
+pseudo-aleatórios (caso não informado, o valor *default* é *time(NULL)+PID*).
+- **-v**: Modo de visualização da execução, para DEBUG.
+
+Para mais detalhes sobre os parâmetros:
+
+- **-h**: Para exibir um menu de ajuda.
+
 

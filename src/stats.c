@@ -2,7 +2,7 @@
 
 #include "queue.h"
 #include "proc.h"
-#include "time.h"
+#include "proc_time.h"
 
 extern int NPROC;
 
