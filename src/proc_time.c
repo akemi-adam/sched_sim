@@ -42,6 +42,8 @@ double set_time_diff_now(struct timeval t)
     struct timeval now;
     gettimeofday(&now, NULL);
 
+    // NOTE: a diferença de tempo é em microsegundos
+
     // computando a diferença de tempo
     // return ((double)(now.tv_sec + now.tv_usec*1.e-6) - (t.tv_sec + t.tv_usec*1.e-6));
     return ((double)(now.tv_sec/1.e-6 + now.tv_usec) - (t.tv_sec/1.e-6 + t.tv_usec));

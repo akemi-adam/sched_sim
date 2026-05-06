@@ -27,6 +27,9 @@ int QUANTUM = 20;
 // Habilita ou desabilita o modo VERBOSE (DEBUG)
 int VERBOSE = 0;
 
+// Opção de fixar o valor da semente
+int SEED = -1;
+
 // Valor que define a chance de haver uma interrupção
 double INTERRUPT_PROB = 0.5;
 
@@ -59,17 +62,19 @@ int main (int argc, char *argv[])
 {
     // tratando os parametros da linha de comando
     int opt;
-    while ((opt = getopt(argc, argv, "n:q:vh")) != -1) {
+    while ((opt = getopt(argc, argv, "n:q:s:vh")) != -1) {
         switch (opt) {
             // Imprimindo uma mensagem de ajuda (help)
             case 'h':
                 printf("Ajuda:\n");
-                printf("\t-n NPROC - Numero de processos.\n");
+                printf("\t-n NPROC: Numero de processos.\n");
                 printf("\t\tValido se NPROC >= 1. Default: NPROC = 10\n");
-                printf("\t-q QUANTUM - Valor do QUANTUM.\n");
+                printf("\t-q QUANTUM: Valor do QUANTUM.\n");
                 printf("\t\tValido se QUANTUM >= 2. Default: QUANTUM = 20\n");
-                printf("\t-v - Habilita o modo 'verbose', para debug.\n");
-                printf("\t-h - Exibe esta ajuda.\n");
+                printf("\t-s SEED: Valor fixo para a semente aleatória.\n");
+                printf("\t\tValido se SEED != 1. Default: SEED = time(NULL)\n");
+                printf("\t-v: Habilita o modo 'verbose', para debug.\n");
+                printf("\t-h: Exibe esta ajuda.\n");
                 exit(0);
                 break;
 
@@ -91,6 +96,16 @@ int main (int argc, char *argv[])
                 {
                     fprintf(stderr, "Informe um valor válido para o QUANTUM [QUANTUM >= 2]\n");
                     exit(2);
+                }
+                break;
+
+            // Fixando a SEED do srand
+            case 's':
+                SEED = atoi(optarg);
+                if( SEED == -1)
+                {
+                    fprintf(stderr, "Informe um valor válido para o SEED [SEED != -1]\n");
+                    exit(3);
                 }
                 break;
 
@@ -139,7 +154,12 @@ int main (int argc, char *argv[])
     }
 
     // Iniciando a semente do random
-    srand(time(NULL));
+    if (SEED == -1)
+        srand(time(NULL)+(int)getpid());
+    else
+        srand(SEED);
+                
+    printf("SEED: %d\n", SEED);
 
     vprint("%s MAIN - Iniciando filas\n", event());
 

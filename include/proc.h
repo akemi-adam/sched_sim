@@ -6,7 +6,7 @@
 //enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 enum procstate { READY, RUNNING, BLOCKED, FINISHED };
 
-// process control block
+// PCB - Process Control Block
 struct proc
 {
     // informações do processo
