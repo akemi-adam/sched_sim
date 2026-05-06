@@ -66,7 +66,7 @@ Onde, os parâmetros significam:
 Para análise da execução:
 
 - **-s SEED**: Para fixar um valor da semente da geração de números
-pseudo-aleatórios, para DEBUG.
+pseudo-aleatórios (caso não informado, o valor *default* é *time(NULL)+PID*).
 - **-v**: Modo de visualização da execução, para DEBUG.
 
 Para mais detalhes sobre os parâmetros:

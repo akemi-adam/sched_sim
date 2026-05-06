@@ -72,7 +72,7 @@ int main (int argc, char *argv[])
                 printf("\t-q QUANTUM: Valor do QUANTUM.\n");
                 printf("\t\tValido se QUANTUM >= 2. Default: QUANTUM = 20\n");
                 printf("\t-s SEED: Valor fixo para a semente aleatória.\n");
-                printf("\t\tValido se SEED != 1. Default: SEED = time(NULL)\n");
+                printf("\t\tValido se SEED != 1. Default: SEED = time(NULL)+PID\n");
                 printf("\t-v: Habilita o modo 'verbose', para debug.\n");
                 printf("\t-h: Exibe esta ajuda.\n");
                 exit(0);
