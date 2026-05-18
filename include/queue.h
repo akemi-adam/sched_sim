@@ -24,6 +24,9 @@ struct proc * dequeue_bypid(struct queue * q, int pid);
 // imprime todos os elementos de uma fila
 void printqueue(struct queue *q);
 
+// Imprime todos os elementos de uma fila de forma mais enxuta
+void print_simple_queue(struct queue*);
+
 // conta quantos elementos há em uma fila
 int countqueue(struct queue *q);
 

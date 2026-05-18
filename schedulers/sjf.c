@@ -20,6 +20,44 @@ struct proc * scheduler(struct proc * current)
 {
     struct proc * selected; 
 
-    return NULL;
+    if (current != NULL)
+    {
+        switch (current->state) 
+        {
+            case READY:
+                enqueue(ready, current);
+                break;
+            case BLOCKED:
+                enqueue(blocked, current);
+                break;
+            case FINISHED:
+                enqueue(finished, current);
+                break;
+            default:
+                printf("@@ ERRO no estado de saída do processo %d\n", current->pid);
+        }
+    }
+
+    if (isempty(ready))
+        return NULL;
+
+    struct proc * processoApto = ready->head,
+        * processoMaisRapido = NULL;
+
+    while (processoApto != NULL)
+    {
+        if (processoMaisRapido == NULL || processoMaisRapido->remaining_time > processoApto->remaining_time)
+        {
+            processoMaisRapido = processoApto;
+        }
+        processoApto = processoApto->next;
+    }
+
+    selected = processoMaisRapido;
+    dequeue_bypid(ready, selected->pid);
+
+    selected->state = RUNNING;
+
+    return selected;
 }
 

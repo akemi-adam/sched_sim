@@ -211,6 +211,29 @@ void printqueue(struct queue *q)
     
 }
 
+/**
+ * Mostra os processos em uma fila, de forma mais enxuta. Usada para debug.
+ * 
+ * @param struct queue *q Ponteiro de uma fila
+ * @return void
+ */
+void print_simple_queue(struct queue *q)
+{
+    if (isempty(q))
+    {
+        printf("Fila vazia.\n");
+        return;
+    }
+
+    struct proc *aux;
+
+    printf("\t_______________________________\n");
+    printf("\tFila %d\n", q->head->queue);
+
+    for(aux = q->head; aux != NULL; aux = aux->next)
+        printf(aux->next != NULL ? "P%d (%d), " : "P%d (%d).\n", aux->pid, aux->process_time_total);
+}
+
 int countqueue(struct queue *q)
 {
     struct proc *aux;

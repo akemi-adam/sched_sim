@@ -59,3 +59,5 @@ main_prio_static
 main_prio_dynamic
 main_prio_dynamic_quantum
 
+*.txt
+*.csv
