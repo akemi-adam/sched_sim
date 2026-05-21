@@ -22,7 +22,79 @@ extern int QUANTUM;
 struct proc * scheduler(struct proc * current)
 {
     struct proc * selected; 
+ 
+    if (current != NULL)
+    {
+        // Calcula percentual de QUANTUM utilizado pelo processo
+        int percentual_quantum_usado = (current->process_time * 100) / QUANTUM;
+        
+        // Feedback dinâmico: classifica a fila baseado no uso do QUANTUM
+        if (percentual_quantum_usado < 50)
+        {
+            // Processo que usa pouco QUANTUM (I/O bound) vai para Fila 1
+            current->queue = 0;
+            
+            switch (current->state)
+            {
+                case READY:
+                    enqueue(ready, current);
+                    break;
+                case BLOCKED:
+                    enqueue(blocked, current);
+                    break;
+                case FINISHED:
+                    enqueue(finished, current);
+                    break;
+                default:
+                    printf("@@ ERRO no estado de saída do processo %d\n", current->pid);
+            }
+        }
+        else
+        {
+            // Processo que usa muito QUANTUM (CPU bound) vai para Fila 2
+            current->queue = 1;
+            
+            switch (current->state)
+            {
+                case READY:
+                    enqueue(ready, current);
+                    break;
+                case BLOCKED:
+                    enqueue(blocked, current);
+                    break;
+                case FINISHED:
+                    enqueue(finished, current);
+                    break;
+                default:
+                    printf("@@ ERRO no estado de saída do processo %d\n", current->pid);
+            }
+        }
+    }
+ 
+    if (isempty(ready) && isempty(ready2))
+    {
+        return NULL;
+    }
+ 
+    struct queue * targetQueue = NULL;
+    int queueCode = 0;
 
-    return NULL;
+    // Seleção probabilística: 70% Fila 1, 30% Fila 2
+    if (!isempty(ready) && (isempty(ready2) || make_rand(100) < 70))
+    {    
+        targetQueue = ready;
+        queueCode = 0;
+    }
+    else
+    {
+        targetQueue = ready2;
+        queueCode = 1;
+    }
+ 
+    selected = dequeue(targetQueue);
+ 
+    selected->queue = queueCode;
+    selected->state = RUNNING;
+ 
+    return selected;
 }
-

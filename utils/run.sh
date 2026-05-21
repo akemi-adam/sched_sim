@@ -5,7 +5,7 @@
 # Seguindo o que está no material. Ele basicamente percorre todas as quantidades de números de processos
 # Percorre as variações de quantum e os algoritmos
 
-algoritmos=("fifo" "sjf" "ljf" "prio_static")
+algoritmos=("fifo" "sjf" "ljf" "prio_static" "prio_dynamic" "prio_dynamic_quantum")
 
 saida="estatisticas_tme.csv"
 
