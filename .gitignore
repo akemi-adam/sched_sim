@@ -60,4 +60,4 @@ main_prio_dynamic
 main_prio_dynamic_quantum
 
 *.txt
-*.csv
+.csv
